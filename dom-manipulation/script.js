@@ -1,4 +1,5 @@
 let localQuotes = [];
+let selectedCategory = 'All'; // added variable
 
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(localQuotes));
@@ -99,6 +100,7 @@ function categoryFilter(category) {
 }
 
 function filterQuote(category) {
+  selectedCategory = category; // update selected category
   const filteredQuotes = categoryFilter(category);
   quoteDisplay(filteredQuotes);
 }
