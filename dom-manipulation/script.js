@@ -37,7 +37,7 @@ function createAddQuoteForm() {
     <label for="quote-content">Quote:</label>
     <input type="text" id="quote-content" name="quote-content"><br><br>
     <label for="quote-category">Category:</label>
-    <input type="text" id="quote-category" name="quote-category"><br><br>
+    <select id="quote-category" name="quote-category"></select><br><br>
     <input type="button" value="Add Quote" id="add-quote-button">
     <input type="file" id="quote-file" name="quote-file">
   `;
@@ -49,6 +49,8 @@ function createAddQuoteForm() {
 
   const quoteFileElement = document.getElementById('quote-file');
   quoteFileElement.addEventListener('change', handleFileChange);
+
+  populateCategories();
 }
 
 function addQuote() {
@@ -80,6 +82,20 @@ function handleFileChange(event) {
     syncQuotes();
   };
   reader.readAsText(file);
+}
+
+function populateCategories() {
+  const categorySelectElement = document.getElementById('quote-category');
+  const categories = [...new Set(localQuotes.map(quote => quote.category))];
+  categories.forEach(category => {
+    const optionElement = document.createElement('option');
+    optionElement.textContent = category;
+    categorySelectElement.appendChild(optionElement);
+  });
+}
+
+function categoryFilter(category) {
+  return localQuotes.filter(quote => quote.category === category);
 }
 
 function random(min, max) {
