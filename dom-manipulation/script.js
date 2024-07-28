@@ -4,16 +4,16 @@ const apiUrl = 'https://jsonplaceholder.typicode.com/quotes';
 let localQuotes = [];
 let serverQuotes = [];
 
-function fetchServerData() {
+function fetchQuotesFromServer() {
   fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
+   .then(response => response.json())
+   .then(data => {
       serverQuotes = data;
       syncData();
     });
 }
 
-setInterval(fetchServerData, 10000); // fetch data every 10 seconds
+setInterval(fetchQuotesFromServer, 10000); // fetch data every 10 seconds
 
 // Step 2: Implement Data Syncing
 function syncData() {
@@ -21,21 +21,21 @@ function syncData() {
   const serverQuoteIds = serverQuotes.map(quote => quote.id);
 
   // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
+  const newQuotes = serverQuotes.filter(quote =>!localQuoteIds.includes(quote.id));
   localQuotes.push(...newQuotes);
 
   // Check for updated quotes from the server
   const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
   updatedQuotes.forEach(quote => {
     const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex !== -1) {
+    if (localQuoteIndex!== -1) {
       localQuotes[localQuoteIndex] = quote;
     }
   });
 
   // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
+  const deletedQuoteIds = localQuoteIds.filter(id =>!serverQuoteIds.includes(id));
+  localQuotes = localQuotes.filter(quote =>!deletedQuoteIds.includes(quote.id));
 
   // Save local quotes to storage
   saveQuotes();
