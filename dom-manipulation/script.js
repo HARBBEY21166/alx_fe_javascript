@@ -169,6 +169,7 @@ async function fetchQuotesFromServer() {
     saveQuotes();
     filterQuote(selectedCategory);
   } catch (error) {
+    alert('Error fetching quotes from server:');
     console.error('Error fetching quotes from server:', error);
   }
 }
