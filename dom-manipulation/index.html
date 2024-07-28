@@ -20,6 +20,11 @@
   </select>
   <button id="exportButton">Export Quotes</button>
   <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+  <!-- Add a notification element -->
+<div id="notification" style="display: none;"></div>
+
+<!-- Add a button for manual conflict resolution -->
+<button id="conflict-resolution-button" style="display: none;" onclick="manualConflictResolution()">Resolve Conflicts Manually</button>
   <script src="script.js"></script>
 </body>
 </html>
