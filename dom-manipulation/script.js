@@ -98,6 +98,22 @@ function categoryFilter(category) {
   return localQuotes.filter(quote => quote.category === category);
 }
 
+function filterQuote(category) {
+  const filteredQuotes = categoryFilter(category);
+  quoteDisplay(filteredQuotes);
+}
+
+function quoteDisplay(quotes) {
+  const quoteListElement = document.getElementById('quote-list');
+  quoteListElement.innerHTML = '';
+
+  quotes.forEach(quote => {
+    const quoteElement = document.createElement('li');
+    quoteElement.textContent = quote.content;
+    quoteListElement.appendChild(quoteElement);
+  });
+}
+
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
