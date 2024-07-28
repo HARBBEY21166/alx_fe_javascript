@@ -12,8 +12,20 @@ function loadQuotes() {
 }
 
 function syncQuotes() {
-  // TO DO: implement syncing with server
-  console.log('Syncing quotes with server...');
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/sync', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log('Quotes synced with server!');
+    } else {
+      console.error('Error syncing quotes with server:', xhr.statusText);
+    }
+  };
+
+  const quotesBlob = new Blob([JSON.stringify(localQuotes)], { type: 'application/json' });
+  xhr.send(quotesBlob);
 }
 
 function createAddQuoteForm() {
