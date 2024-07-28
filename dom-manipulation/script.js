@@ -1,149 +1,57 @@
-// Step 1: Simulate Server Interaction
-const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
-
 let localQuotes = [];
-let serverQuotes = [];
-let categories = [];
-
-async function fetchQuotesFromServer() {
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    serverQuotes = data;
-    syncData();
-  } catch (error) {
-    console.error('Error fetching quotes:', error);
-  }
-}
-
-async function sendQuoteToServer(quote) {
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(quote)
-    });
-    const data = await response.json();
-    console.log('Quote sent to server:', data);
-  } catch (error) {
-    console.error('Error sending quote to server:', error);
-  }
-}
-
-async function syncQuotes() {
-  // Sync local quotes with server quotes
-  for (const localQuote of localQuotes) {
-    const serverQuote = serverQuotes.find(quote => quote.id === localQuote.id);
-    if (serverQuote) {
-      // Update local quote with server quote
-      localQuote.content = serverQuote.content;
-    } else {
-      // Send local quote to server
-      await sendQuoteToServer(localQuote);
-    }
-  }
-  alert('Quotes synced with server!');
-}
 
 function saveQuotes() {
-  // Save local quotes to local storage
-  localStorage.setItem('localQuotes', JSON.stringify(localQuotes));
+  localStorage.setItem('quotes', JSON.stringify(localQuotes));
 }
 
-setInterval(fetchQuotesFromServer, 10000); // fetch data every 10 seconds
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    localQuotes = JSON.parse(storedQuotes);
+  }
+}
 
-// Step 2: Implement Data Syncing
-function syncData() {
-  const localQuoteIds = localQuotes.map(quote => quote.id);
-  const serverQuoteIds = serverQuotes.map(quote => quote.id);
+function syncQuotes() {
+  // TO DO: implement syncing with server
+  console.log('Syncing quotes with server...');
+}
 
-  // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
-  localQuotes.push(...newQuotes);
+function createAddQuoteForm() {
+  const addQuoteFormElement = document.getElementById('add-quote-form');
+  addQuoteFormElement.innerHTML = '';
 
-  // Check for updated quotes from the server
-  const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
-  updatedQuotes.forEach(quote => {
-    const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex !== -1) {
-      localQuotes[localQuoteIndex] = quote;
-    }
-  });
+  const formHTML = `
+    <label for="quote-content">Quote:</label>
+    <input type="text" id="quote-content" name="quote-content"><br><br>
+    <label for="quote-category">Category:</label>
+    <input type="text" id="quote-category" name="quote-category"><br><br>
+    <input type="button" value="Add Quote" id="add-quote-button">
+  `;
 
-  // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
+  addQuoteFormElement.innerHTML = formHTML;
 
-  // Save local quotes to storage
+  const addQuoteButtonElement = document.getElementById('add-quote-button');
+  addQuoteButtonElement.addEventListener('click', addQuote);
+}
+
+function addQuote() {
+  const quoteContentElement = document.getElementById('quote-content');
+  const quoteCategoryElement = document.getElementById('quote-category');
+
+  const newQuote = {
+    id: localQuotes.length + 1,
+    content: quoteContentElement.value,
+    category: quoteCategoryElement.value
+  };
+
+  localQuotes.push(newQuote);
   saveQuotes();
-
-  // Notify user of updates
-  notifyUserOfUpdates();
-
-  // Sync local quotes with server quotes
   syncQuotes();
 
-  // Populate categories
-  populateCategories();
+  quoteContentElement.value = '';
+  quoteCategoryElement.value = '';
 }
 
-// Step 3: Handling Conflicts
-function notifyUserOfUpdates() {
-  const notificationElement = document.getElementById('notification');
-  notificationElement.textContent = 'Data has been updated!';
-  notificationElement.style.display = 'block';
-
-  // Provide an option for users to manually resolve conflicts
-  const conflictResolutionButton = document.getElementById('conflict-resolution-button');
-  conflictResolutionButton.style.display = 'block';
-}
-
-function manualConflictResolution() {
-  // Implement manual conflict resolution logic here
-  console.log('Manual conflict resolution triggered');
-}
-
-// Step 4: Testing and Verification
-function testSyncAndConflictResolution() {
-  // Test syncing and conflict resolution logic here
-  console.log('Testing sync and conflict resolution...');
-
-  // Test sending a quote to the server
-  const testQuote = { id: 1, content: 'Test quote' };
-  sendQuoteToServer(testQuote);
-}
-
-// Step 5: Filtering Quotes by Category
-function populateCategories() {
-  const categoryListElement = document.getElementById('category-list');
-  categoryListElement.innerHTML = '';
-
-  categories = [...new Set(localQuotes.map(quote => quote.category))];
-  categories.forEach(category => {
-    const categoryElement = document.createElement('li');
-    categoryElement.textContent = category;
-    categoryElement.addEventListener('click', () => {
-      categoryFilter(category);
-    });
-    categoryListElement.appendChild(categoryElement);
-  });
-}
-
-function categoryFilter(category) {
-  const quoteListElement = document.getElementById('quote-list');
-  quoteListElement.innerHTML = '';
-
-  const filteredQuotes = localQuotes.filter(quote => quote.category === category);
-  filteredQuotes.forEach(quote => {
-    const quoteElement = document.createElement('li');
-    quoteElement.textContent = quote.content;
-    quoteListElement.appendChild(quoteElement);
-  });
-}
-
-// Step 6: Displaying Random Quotes
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -163,10 +71,8 @@ function showRandomQuote() {
   }
 }
 
-// Initialize random quote display
+loadQuotes();
+createAddQuoteForm();
 showRandomQuote();
 
-// Set interval to show a new random quote every 10 seconds
 setInterval(showRandomQuote, 10000);
-
-testSyncAndConflictResolution();
