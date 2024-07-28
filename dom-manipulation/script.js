@@ -158,7 +158,12 @@ let selectedCategory = 'All';
 
 async function fetchQuotesFromServer() {
   try {
-    const response = await fetch('https://jsonplaceholder.typicode.com/posts.json');
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts.json', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     const quotesFromServer = await response.json();
     localQuotes = quotesFromServer;
     saveQuotes();
