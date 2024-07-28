@@ -3,6 +3,7 @@ const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
 
 let localQuotes = [];
 let serverQuotes = [];
+let categories = [];
 
 async function fetchQuotesFromServer() {
   try {
@@ -59,21 +60,21 @@ function syncData() {
   const serverQuoteIds = serverQuotes.map(quote => quote.id);
 
   // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
+  const newQuotes = serverQuotes.filter(quote =>!localQuoteIds.includes(quote.id));
   localQuotes.push(...newQuotes);
 
   // Check for updated quotes from the server
   const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
   updatedQuotes.forEach(quote => {
     const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex !== -1) {
+    if (localQuoteIndex!== -1) {
       localQuotes[localQuoteIndex] = quote;
     }
   });
 
   // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
+  const deletedQuoteIds = localQuoteIds.filter(id =>!serverQuoteIds.includes(id));
+  localQuotes = localQuotes.filter(quote =>!deletedQuoteIds.includes(quote.id));
 
   // Save local quotes to storage
   saveQuotes();
@@ -83,6 +84,9 @@ function syncData() {
 
   // Sync local quotes with server quotes
   syncQuotes();
+
+  // Populate categories
+  populateCategories();
 }
 
 // Step 3: Handling Conflicts
@@ -109,6 +113,34 @@ function testSyncAndConflictResolution() {
   // Test sending a quote to the server
   const testQuote = { id: 1, content: 'Test quote' };
   sendQuoteToServer(testQuote);
+}
+
+// Step 5: Filtering Quotes by Category
+function populateCategories() {
+  const categoryListElement = document.getElementById('category-list');
+  categoryListElement.innerHTML = '';
+
+  categories = [...new Set(localQuotes.map(quote => quote.category))];
+  categories.forEach(category => {
+    const categoryElement = document.createElement('li');
+    categoryElement.textContent = category;
+    categoryElement.addEventListener('click', () => {
+      categoryFilter(category);
+    });
+    categoryListElement.appendChild(categoryElement);
+  });
+}
+
+function categoryFilter(category) {
+  const quoteListElement = document.getElementById('quote-list');
+  quoteListElement.innerHTML = '';
+
+  const filteredQuotes = localQuotes.filter(quote => quote.category === category);
+  filteredQuotes.forEach(quote => {
+    const quoteElement = document.createElement('li');
+    quoteElement.textContent = quote.content;
+    quoteListElement.appendChild(quoteElement);
+  });
 }
 
 testSyncAndConflictResolution();
