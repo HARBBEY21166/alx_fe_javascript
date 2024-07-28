@@ -15,6 +15,22 @@ async function fetchQuotesFromServer() {
   }
 }
 
+async function sendQuoteToServer(quote) {
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(quote)
+    });
+    const data = await response.json();
+    console.log('Quote sent to server:', data);
+  } catch (error) {
+    console.error('Error sending quote to server:', error);
+  }
+}
+
 setInterval(fetchQuotesFromServer, 10000); // fetch data every 10 seconds
 
 // Step 2: Implement Data Syncing
@@ -66,6 +82,10 @@ function manualConflictResolution() {
 function testSyncAndConflictResolution() {
   // Test syncing and conflict resolution logic here
   console.log('Testing sync and conflict resolution...');
+
+  // Test sending a quote to the server
+  const testQuote = { id: 1, content: 'Test quote' };
+  sendQuoteToServer(testQuote);
 }
 
 testSyncAndConflictResolution();
