@@ -60,21 +60,21 @@ function syncData() {
   const serverQuoteIds = serverQuotes.map(quote => quote.id);
 
   // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote =>!localQuoteIds.includes(quote.id));
+  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
   localQuotes.push(...newQuotes);
 
   // Check for updated quotes from the server
   const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
   updatedQuotes.forEach(quote => {
     const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex!== -1) {
+    if (localQuoteIndex !== -1) {
       localQuotes[localQuoteIndex] = quote;
     }
   });
 
   // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id =>!serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote =>!deletedQuoteIds.includes(quote.id));
+  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
+  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
 
   // Save local quotes to storage
   saveQuotes();
@@ -142,5 +142,31 @@ function categoryFilter(category) {
     quoteListElement.appendChild(quoteElement);
   });
 }
+
+// Step 6: Displaying Random Quotes
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function showRandomQuote() {
+  const quoteListElement = document.getElementById('quote-list');
+  quoteListElement.innerHTML = '';
+
+  if (localQuotes.length > 0) {
+    const randomIndex = random(0, localQuotes.length - 1);
+    const randomQuote = localQuotes[randomIndex];
+    const quoteElement = document.createElement('li');
+    quoteElement.textContent = randomQuote.content;
+    quoteListElement.appendChild(quoteElement);
+  } else {
+    quoteListElement.textContent = 'No quotes available.';
+  }
+}
+
+// Initialize random quote display
+showRandomQuote();
+
+// Set interval to show a new random quote every 10 seconds
+setInterval(showRandomQuote, 10000);
 
 testSyncAndConflictResolution();
