@@ -4,7 +4,7 @@ let lastSelectedFilter = null;
 
 function loadQuotes() {
   const storedQuotes = localStorage.getItem("quotes");
-  if (storedQuotes !== null) {
+  if (storedQuotes!== null) {
     quotes = JSON.parse(storedQuotes);
   } else {
     quotes = [];
@@ -17,7 +17,7 @@ function saveQuotes() {
 
 function loadLastViewedQuote() {
   const storedLastViewedQuote = sessionStorage.getItem("lastViewedQuote");
-  if (storedLastViewedQuote !== null) {
+  if (storedLastViewedQuote!== null) {
     lastViewedQuote = JSON.parse(storedLastViewedQuote);
   } else {
     lastViewedQuote = null;
@@ -30,7 +30,7 @@ function saveLastViewedQuote() {
 
 function loadLastSelectedFilter() {
   const storedLastSelectedFilter = localStorage.getItem("lastSelectedFilter");
-  if (storedLastSelectedFilter !== null) {
+  if (storedLastSelectedFilter!== null) {
     lastSelectedFilter = storedLastSelectedFilter;
   } else {
     lastSelectedFilter = "all";
@@ -70,6 +70,12 @@ function updateCategories() {
   });
 }
 
+function populateCategories() {
+  updateCategories();
+  const categoryFilter = document.getElementById("categoryFilter");
+  categoryFilter.value = lastSelectedFilter;
+}
+
 function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
   lastSelectedFilter = selectedCategory;
@@ -99,3 +105,31 @@ function exportToJson() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "quotes.json";
+  a.click();
+}
+
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    updateCategories();
+    filterQuotes();
+    alert("Quotes imported successfully!");
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
+
+function init() {
+  loadQuotes();
+  loadLastViewedQuote();
+  loadLastSelectedFilter();
+  populateCategories();
+  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+  document.getElementById("exportButton").addEventListener("click", exportToJson);
+  document.getElementById("importButton").addEventListener("change", importFromJsonFile);
+  filterQuotes();
+}
+
+init();
