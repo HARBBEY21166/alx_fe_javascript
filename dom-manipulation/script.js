@@ -99,31 +99,3 @@ function exportToJson() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "quotes.json";
-  a.click();
-}
-
-function importFromJsonFile(event) {
-  const fileReader = new FileReader();
-  fileReader.onload = function(event) {
-    const importedQuotes = JSON.parse(event.target.result);
-    quotes.push(...importedQuotes);
-    saveQuotes();
-    updateCategories();
-    filterQuotes();
-    alert("Quotes imported successfully!");
-  };
-  fileReader.readAsText(event.target.files[0]);
-}
-
-function init() {
-  loadQuotes();
-  loadLastViewedQuote();
-  loadLastSelectedFilter();
-  updateCategories();
-  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-  document.getElementById("exportButton").addEventListener("click", exportToJson);
-  document.getElementById("categoryFilter").value = lastSelectedFilter;
-  filterQuotes();
-}
-
-init();
