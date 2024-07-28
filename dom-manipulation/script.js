@@ -153,6 +153,22 @@ function fetchQuotesFromServer() {
   xhr.send();
 }
 
+let localQuotes = [];
+let selectedCategory = 'All';
+
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts.json');
+    const quotesFromServer = await response.json();
+    localQuotes = quotesFromServer;
+    saveQuotes();
+    filterQuote(selectedCategory);
+  } catch (error) {
+    console.error('Error fetching quotes from server:', error);
+  }
+}
+
+
 loadQuotes();
 createAddQuoteForm();
 fetchQuotesFromServer(); // fetch quotes from server on page load
