@@ -43,6 +43,7 @@ async function syncQuotes() {
       await sendQuoteToServer(localQuote);
     }
   }
+  alert('Quotes synced with server!');
 }
 
 function saveQuotes() {
@@ -58,21 +59,21 @@ function syncData() {
   const serverQuoteIds = serverQuotes.map(quote => quote.id);
 
   // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote =>!localQuoteIds.includes(quote.id));
+  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
   localQuotes.push(...newQuotes);
 
   // Check for updated quotes from the server
   const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
   updatedQuotes.forEach(quote => {
     const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex!== -1) {
+    if (localQuoteIndex !== -1) {
       localQuotes[localQuoteIndex] = quote;
     }
   });
 
   // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id =>!serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote =>!deletedQuoteIds.includes(quote.id));
+  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
+  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
 
   // Save local quotes to storage
   saveQuotes();
