@@ -1,16 +1,18 @@
 // Step 1: Simulate Server Interaction
-const apiUrl = 'https://jsonplaceholder.typicode.com/quotes';
+const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
 
 let localQuotes = [];
 let serverQuotes = [];
 
-function fetchQuotesFromServer() {
-  fetch(apiUrl)
-   .then(response => response.json())
-   .then(data => {
-      serverQuotes = data;
-      syncData();
-    });
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    serverQuotes = data;
+    syncData();
+  } catch (error) {
+    console.error('Error fetching quotes:', error);
+  }
 }
 
 setInterval(fetchQuotesFromServer, 10000); // fetch data every 10 seconds
@@ -21,21 +23,21 @@ function syncData() {
   const serverQuoteIds = serverQuotes.map(quote => quote.id);
 
   // Check for new quotes from the server
-  const newQuotes = serverQuotes.filter(quote =>!localQuoteIds.includes(quote.id));
+  const newQuotes = serverQuotes.filter(quote => !localQuoteIds.includes(quote.id));
   localQuotes.push(...newQuotes);
 
   // Check for updated quotes from the server
   const updatedQuotes = serverQuotes.filter(quote => localQuoteIds.includes(quote.id));
   updatedQuotes.forEach(quote => {
     const localQuoteIndex = localQuotes.findIndex(localQuote => localQuote.id === quote.id);
-    if (localQuoteIndex!== -1) {
+    if (localQuoteIndex !== -1) {
       localQuotes[localQuoteIndex] = quote;
     }
   });
 
   // Check for deleted quotes from the server
-  const deletedQuoteIds = localQuoteIds.filter(id =>!serverQuoteIds.includes(id));
-  localQuotes = localQuotes.filter(quote =>!deletedQuoteIds.includes(quote.id));
+  const deletedQuoteIds = localQuoteIds.filter(id => !serverQuoteIds.includes(id));
+  localQuotes = localQuotes.filter(quote => !deletedQuoteIds.includes(quote.id));
 
   // Save local quotes to storage
   saveQuotes();
