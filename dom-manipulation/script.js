@@ -14,6 +14,7 @@ function loadQuotes() {
 function syncQuotes() {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', '/sync', true);
+  xhr.setRequestHeader('Accept', 'application/json');
   xhr.setRequestHeader('Content-Type', 'application/json');
 
   xhr.onload = function() {
@@ -38,12 +39,16 @@ function createAddQuoteForm() {
     <label for="quote-category">Category:</label>
     <input type="text" id="quote-category" name="quote-category"><br><br>
     <input type="button" value="Add Quote" id="add-quote-button">
+    <input type="file" id="quote-file" name="quote-file">
   `;
 
   addQuoteFormElement.innerHTML = formHTML;
 
   const addQuoteButtonElement = document.getElementById('add-quote-button');
   addQuoteButtonElement.addEventListener('click', addQuote);
+
+  const quoteFileElement = document.getElementById('quote-file');
+  quoteFileElement.addEventListener('change', handleFileChange);
 }
 
 function addQuote() {
@@ -62,6 +67,19 @@ function addQuote() {
 
   quoteContentElement.value = '';
   quoteCategoryElement.value = '';
+}
+
+function handleFileChange(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function() {
+    const fileContent = reader.result;
+    const quotesFromFile = JSON.parse(fileContent);
+    localQuotes = localQuotes.concat(quotesFromFile);
+    saveQuotes();
+    syncQuotes();
+  };
+  reader.readAsText(file);
 }
 
 function random(min, max) {
