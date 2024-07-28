@@ -1,5 +1,5 @@
 let localQuotes = [];
-let selectedCategory = 'All'; // added variable
+let selectedCategory = 'All';
 
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(localQuotes));
@@ -100,7 +100,7 @@ function categoryFilter(category) {
 }
 
 function filterQuote(category) {
-  selectedCategory = category; // update selected category
+  selectedCategory = category;
   const filteredQuotes = categoryFilter(category);
   quoteDisplay(filteredQuotes);
 }
@@ -135,8 +135,27 @@ function showRandomQuote() {
   }
 }
 
+function fetchQuotesFromServer() {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', '/quotes', true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      const quotesFromServer = JSON.parse(xhr.responseText);
+      localQuotes = quotesFromServer;
+      saveQuotes();
+      filterQuote(selectedCategory);
+    } else {
+      console.error('Error fetching quotes from server:', xhr.statusText);
+    }
+  };
+
+  xhr.send();
+}
+
 loadQuotes();
 createAddQuoteForm();
+fetchQuotesFromServer(); // fetch quotes from server on page load
 showRandomQuote();
 
 setInterval(showRandomQuote, 10000);
