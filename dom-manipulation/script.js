@@ -31,6 +31,20 @@ async function sendQuoteToServer(quote) {
   }
 }
 
+async function syncQuotes() {
+  // Sync local quotes with server quotes
+  for (const localQuote of localQuotes) {
+    const serverQuote = serverQuotes.find(quote => quote.id === localQuote.id);
+    if (serverQuote) {
+      // Update local quote with server quote
+      localQuote.content = serverQuote.content;
+    } else {
+      // Send local quote to server
+      await sendQuoteToServer(localQuote);
+    }
+  }
+}
+
 setInterval(fetchQuotesFromServer, 10000); // fetch data every 10 seconds
 
 // Step 2: Implement Data Syncing
@@ -60,6 +74,9 @@ function syncData() {
 
   // Notify user of updates
   notifyUserOfUpdates();
+
+  // Sync local quotes with server quotes
+  syncQuotes();
 }
 
 // Step 3: Handling Conflicts
